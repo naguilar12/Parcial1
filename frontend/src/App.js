@@ -1,43 +1,79 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './App.css';
 
-class App extends Component {
+
+class App extends React.Component {
 
   constructor(props) {
     super(props);
 
     this.state={
-      followers:[]
-    };
+      currentTag: "",
+      commonTags: [],
+      countTags:{}
+    };    
+
+    this.updateCurrentTag = this.updateCurrentTag.bind(this);
+    this.searchCommonTags = this.searchCommonTags.bind(this);
+    this.makeCount = this.makeCount.bind(this);
+
+
   }
 
   componentDidMount() {
-    let me = this;
-    fetch("api/petrogustavo")
-      .then((res) => {
-        return res.json();
+
+
+
+
+  }
+
+  updateCurrentTag(evt){
+    this.setState({
+      currentTag: evt.target.value
+    })
+
+  }
+
+  searchCommonTags(){
+
+    let url = 'https://www.instagram.com/explore/tags/'+this.state.currentTag+'/?__a=1';
+
+    fetch(url)
+    .then((res) =>{
+      return res.json()})
+    .then((json) => {
+      var edges = json.graphql.hashtag.edge_hashtag_to_top_posts.edges;
+      console.log(edges);
+      //console.log(json.graphql.hashtag.edge_hashtag_to_top_posts.edges[0].node.edge_media_to_caption.edges[0].node.text})
+      console.log(this.state.commonTags);
+      edges.forEach((e)=>{
+        var t = this.state.commontags;
+        t.push(e.node.edge_media_to_caption.edges[0].node.text);
+        this.setState({commontags: e})
       })
-      .then((followers) => {
-        me.setState({followers:followers});
-      })
-      .catch((err) => console.log(err) );
-    
+
+      console.log(this.state.commontags);
+    })
+
+    this.makeCount();
+  }
+
+  makeCount(){
+
+
   }
 
 
   render() {
     return (
       <div className="App">
+      <h1>Tags</h1>
+      <input value={this.state.currentTag} onChange={this.updateCurrentTag}/>
+      <div>Made by Jasdasdohn with <span role="img">❤</span>️</div>
+      <button onClick={this.searchCommonTags}>Aqui</button>
 
-        <h1>Followers </h1>
-        <div>{this.state.followers.map(
-          (f) => {
-            return (<div>{f.follower.screen_name}</div>);
-          })
-        }</div>
-        <div>Made by John with <span role="img">❤</span>️</div>
       </div>
-    );
+      );
   }
 }
 
