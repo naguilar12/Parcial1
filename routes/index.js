@@ -7,7 +7,8 @@ var router = express.Router();
 
 
 // Connection URL
-const url = "mongodb://localhost:27017";
+
+const url = process.env.MONGOLAB_URI;
 
 function saveTag(nTag, callback){
   const dbName = "hashtags";
@@ -45,18 +46,15 @@ function getHistory(callback) {
 
     const db = client.db(dbName);
 
- // Get the documents collection
- const collection = db.collection("history");
-  // Find some documents
-  console.log(collection.find({}));
-  collection.find().toArray(function(err, docs) {
-    assert.equal(err, null);
-    console.log("Found " + docs.length + " records");
-    // console.log(docs);
-    callback(docs);
+    const collection = db.collection("history");
+    console.log(collection.find({}));
+    collection.find().toArray(function(err, docs) {
+      assert.equal(err, null);
+      console.log("Found " + docs.length + " records");
+      callback(docs);
+    });
+    client.close();
   });
-  client.close();
-});
 
 }
 
