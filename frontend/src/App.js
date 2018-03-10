@@ -138,7 +138,7 @@ class App extends React.Component {
       {topHash}
       </div>
       <h1>
-        Busqudas pasadas
+        Busquedas pasadas
       </h1>
       <ul>
       {history}
