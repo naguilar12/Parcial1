@@ -9,23 +9,8 @@ var router = express.Router();
 // Connection URL
 const url = "mongodb://localhost:27017";
 
-
-const findDocuments = function(db, query, callback) {
-  // Get the documents collection
-  const collection = db.collection("followers");
-  // Find some documents
-  collection.find(query).limit(20).toArray(function(err, docs) {
-    assert.equal(err, null);
-    console.log("Found " + docs.length + " records");
-    // console.log(docs);
-    callback(docs);
-  });
-};
-
-function getFollowers(query, callback) {
-
-  // Database Name
-  const dbName = "twitter_followers";
+function saveTag(nTag, callback){
+  const dbName = "hashtags";
 
   // Use connect method to connect to the server
   MongoClient.connect(url, function(err, client) {
@@ -34,20 +19,59 @@ function getFollowers(query, callback) {
 
     const db = client.db(dbName);
 
-    findDocuments(db, query, callback);
+    const collection = db.collection("history");
+    console.log(nTag + "AQUUUUUU")
+
+    collection.save({tag: nTag});
+    assert.equal(err, null);
+
+
 
     client.close();
+    callback("Listo");
+  });  
+}
+
+function getHistory(callback) {
+  console.log("AQUIIIIIIIIII")
+
+  // Database Name
+  const dbName = "hashtags";
+
+  // Use connect method to connect to the server
+  MongoClient.connect(url, function(err, client) {
+    assert.equal(null, err);
+    console.log("Connected successfully to server");
+
+    const db = client.db(dbName);
+
+ // Get the documents collection
+ const collection = db.collection("history");
+  // Find some documents
+  console.log(collection.find({}));
+  collection.find().toArray(function(err, docs) {
+    assert.equal(err, null);
+    console.log("Found " + docs.length + " records");
+    // console.log(docs);
+    callback(docs);
   });
+  client.close();
+});
 
 }
 
-/* GET home page. */
-router.get("/:query", function(req, res) {
+
+router.post("/:tag", function(req, res) {
   console.log(req.params);
-  getFollowers(
-    {user:req.params.query}, 
-    (followers) => res.send(followers) 
-  );
+  saveTag(req.params.tag, (tag) => res.send(tag))
 });
+
+router.get("/history", function(req, res) {
+  console.log(req.params);
+  getHistory( 
+    (history) => res.send(history) 
+    );
+});
+
 
 module.exports = router;
